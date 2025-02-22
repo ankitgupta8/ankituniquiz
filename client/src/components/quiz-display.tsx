@@ -11,16 +11,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Home } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Link } from "wouter";
 
 type QuizDisplayProps = {
   quiz: Quiz;
   onComplete: (score: number) => void;
+  subject?: string;
 };
 
-export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
-  const [selectedSubject, setSelectedSubject] = useState("");
+export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
+  const [selectedSubject, setSelectedSubject] = useState(subject || "");
   const [selectedChapter, setSelectedChapter] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -74,20 +76,22 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
   if (!selectedSubject || !selectedChapter) {
     return (
       <div className="space-y-4">
-        <Select onValueChange={setSelectedSubject}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Subject" />
-          </SelectTrigger>
-          <SelectContent>
-            {quiz.map((subject) => (
-              <SelectItem key={subject.subject} value={subject.subject}>
-                {subject.subject}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {!subject && !selectedSubject && (
+          <Select onValueChange={setSelectedSubject}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Subject" />
+            </SelectTrigger>
+            <SelectContent>
+              {quiz.map((subject) => (
+                <SelectItem key={subject.subject} value={subject.subject}>
+                  {subject.subject}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
-        {selectedSubject && (
+        {(selectedSubject || subject) && (
           <Select onValueChange={setSelectedChapter}>
             <SelectTrigger>
               <SelectValue placeholder="Select Chapter" />
@@ -114,7 +118,7 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
   const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -132,17 +136,19 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
             {currentQuestion.options.map((option) => (
               <div
                 key={option}
-                className={`flex items-center space-x-2 p-2 rounded ${
+                className={`flex items-center space-x-2 p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
                   (showCurrentAnswer || showResults) &&
                   (option === currentQuestion.correctAnswer
-                    ? "bg-green-100"
+                    ? "bg-green-100 border-green-200"
                     : option === answers[currentQuestionIndex]
-                    ? "bg-red-100"
+                    ? "bg-red-100 border-red-200"
                     : "")
                 }`}
               >
                 <RadioGroupItem value={option} id={option} />
-                <Label htmlFor={option}>{option}</Label>
+                <Label htmlFor={option} className="flex-1 cursor-pointer">
+                  {option}
+                </Label>
                 {(showCurrentAnswer || showResults) && (
                   <>
                     {option === currentQuestion.correctAnswer && (
@@ -167,7 +173,51 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
             </Alert>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
+      </Card>
+
+      {showResults && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Quiz Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-xl font-bold">
+                Final Score: {calculateScore()}%
+              </p>
+              <div className="space-y-6">
+                {currentChapter?.quizQuestions.map((question, index) => (
+                  <div key={index} className="space-y-2">
+                    <p className="font-medium">
+                      Question {index + 1}: {question.question}
+                    </p>
+                    <p className={answers[index] === question.correctAnswer ? "text-green-600" : "text-red-600"}>
+                      Your Answer: {answers[index]}
+                    </p>
+                    <p className="text-green-600">
+                      Correct Answer: {question.correctAnswer}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {question.explanation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button asChild>
+              <Link href="/">
+                <Home className="h-4 w-4 mr-2" />
+                Go to Dashboard
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
+
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4">
+        <div className="container flex justify-between items-center">
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -201,41 +251,8 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
               Next
             </Button>
           )}
-        </CardFooter>
-      </Card>
-
-      {showResults && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Quiz Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-xl font-bold">
-                Final Score: {calculateScore()}%
-              </p>
-              <div className="space-y-6">
-                {currentChapter?.quizQuestions.map((question, index) => (
-                  <div key={index} className="space-y-2">
-                    <p className="font-medium">
-                      Question {index + 1}: {question.question}
-                    </p>
-                    <p className={answers[index] === question.correctAnswer ? "text-green-600" : "text-red-600"}>
-                      Your Answer: {answers[index]}
-                    </p>
-                    <p className="text-green-600">
-                      Correct Answer: {question.correctAnswer}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {question.explanation}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

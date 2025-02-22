@@ -15,10 +15,11 @@ export default function HomePage() {
   // Get unique quiz count by filtering unique quiz data subjects
   const uniqueQuizCount = attempts?.reduce((acc, curr) => {
     const quizData = curr.quizData as any;
-    const subject = quizData[0]?.subject;
-    if (!acc.includes(subject)) {
-      acc.push(subject);
-    }
+    quizData.forEach((subject: any) => {
+      if (!acc.includes(subject.subject)) {
+        acc.push(subject.subject);
+      }
+    });
     return acc;
   }, [] as string[]).length || 0;
 
@@ -92,9 +93,8 @@ export default function HomePage() {
                 <div className="text-3xl font-bold">
                   {attempts?.length
                     ? Math.round(
-                        (attempts.reduce((acc, curr) => acc + curr.score, 0) /
-                          attempts.length) *
-                          100
+                        attempts.reduce((acc, curr) => acc + curr.score, 0) /
+                          attempts.length
                       )
                     : 0}
                   %
