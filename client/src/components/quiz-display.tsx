@@ -11,9 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, Home } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Home, Bookmark } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 type QuizDisplayProps = {
   quiz: Quiz;
@@ -28,12 +31,36 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
+  const { toast } = useToast();
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
     (c) => c.chapterName === selectedChapter
   );
   const currentQuestion = currentChapter?.quizQuestions[currentQuestionIndex];
+
+  const bookmarkMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentQuestion || !currentSubject || !currentChapter) return;
+
+      const res = await apiRequest("POST", "/api/bookmarks", {
+        subject: currentSubject.subject,
+        chapterName: currentChapter.chapterName,
+        question: currentQuestion.question,
+        options: currentQuestion.options,
+        correctAnswer: currentQuestion.correctAnswer,
+        explanation: currentQuestion.explanation,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+      toast({
+        title: "Question Bookmarked",
+        description: "You can find this question in your bookmarks",
+      });
+    },
+  });
 
   const handleAnswer = (answer: string) => {
     const newAnswers = [...answers];
@@ -120,11 +147,18 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   return (
     <div className="space-y-6 pb-24">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
             Question {currentQuestionIndex + 1} of{" "}
             {currentChapter?.quizQuestions.length}
           </CardTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => bookmarkMutation.mutate()}
+          >
+            <Bookmark className="h-4 w-4" />
+          </Button>
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-lg">{currentQuestion.question}</p>

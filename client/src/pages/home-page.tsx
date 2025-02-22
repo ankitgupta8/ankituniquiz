@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { QuizAttempt } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, History, LogOut } from "lucide-react";
+import { PlusCircle, History, LogOut, Bookmark } from "lucide-react";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
@@ -63,6 +63,12 @@ export default function HomePage() {
                 <Link href="/take">
                   <History className="h-4 w-4 mr-2" />
                   Take Quiz
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/bookmarks">
+                  <Bookmark className="h-4 w-4 mr-2" />
+                  Bookmarks
                 </Link>
               </Button>
             </div>
