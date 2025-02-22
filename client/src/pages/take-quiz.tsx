@@ -9,13 +9,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, AlertCircle } from "lucide-react";
 
 export default function TakeQuiz() {
-  const [selectedQuiz, setSelectedQuiz] = useState<QuizAttempt | null>(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const { data: attempts, isLoading, error } = useQuery<QuizAttempt[]>({
     queryKey: ["/api/quizzes"],
   });
+
+  // Get unique quizzes by comparing stringified quiz data
+  const uniqueQuizzes = attempts?.reduce<Quiz[]>((acc, curr) => {
+    const quizData = curr.quizData as Quiz;
+    const exists = acc.some(
+      (q) => JSON.stringify(q) === JSON.stringify(quizData)
+    );
+    if (!exists) {
+      acc.push(quizData);
+    }
+    return acc;
+  }, []) || [];
 
   const submitMutation = useMutation({
     mutationFn: async (data: { quizData: Quiz; score: number }) => {
@@ -42,7 +54,7 @@ export default function TakeQuiz() {
   const handleComplete = (score: number) => {
     if (selectedQuiz) {
       submitMutation.mutate({
-        quizData: selectedQuiz.quizData as Quiz,
+        quizData: selectedQuiz,
         score,
       });
     }
@@ -71,7 +83,7 @@ export default function TakeQuiz() {
     );
   }
 
-  if (!attempts?.length) {
+  if (!uniqueQuizzes.length) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container py-8">
@@ -100,20 +112,19 @@ export default function TakeQuiz() {
           <CardContent>
             {!selectedQuiz ? (
               <div className="grid gap-4">
-                {attempts.map((attempt) => (
+                {uniqueQuizzes.map((quiz, index) => (
                   <Card
-                    key={attempt.id}
+                    key={index}
                     className="cursor-pointer hover:bg-accent transition-colors"
-                    onClick={() => setSelectedQuiz(attempt)}
+                    onClick={() => setSelectedQuiz(quiz)}
                   >
                     <CardContent className="flex items-center justify-between p-4">
                       <div>
                         <p className="font-medium">
-                          {(attempt.quizData as Quiz)[0]?.subject || "Untitled Quiz"}
+                          {quiz[0]?.subject || "Untitled Quiz"}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Created on{" "}
-                          {new Date(attempt.timestamp!).toLocaleDateString()}
+                          {quiz[0]?.chapters.length} chapter(s)
                         </p>
                       </div>
                     </CardContent>
@@ -121,10 +132,7 @@ export default function TakeQuiz() {
                 ))}
               </div>
             ) : (
-              <QuizDisplay
-                quiz={selectedQuiz.quizData as Quiz}
-                onComplete={handleComplete}
-              />
+              <QuizDisplay quiz={selectedQuiz} onComplete={handleComplete} />
             )}
           </CardContent>
         </Card>
