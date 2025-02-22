@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Eye, Home, Bookmark, BookmarkX } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
-import { toast } from 'react-hot-toast'; // Added import for toast notifications
+import { useToast } from "@/hooks/use-toast"; // Updated import for toast notifications
 
 type QuizDisplayProps = {
   quiz: Quiz;
@@ -30,6 +30,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
   const [bookmarks, setBookmarks] = useState([]); // Added bookmark state
+  const toast = useToast(); // Initialize useToast hook
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
