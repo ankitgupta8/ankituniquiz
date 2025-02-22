@@ -118,10 +118,10 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
 
   return (
-    <div className="space-y-6 pb-24 bg-gradient-to-b from-sky-100 to-blue-100 rounded-lg shadow-lg p-6"> {/* Added background gradient and rounded corners */}
-      <Card className="rounded-lg shadow-md"> {/* Added rounded corners */}
+    <div className="space-y-6 pb-24 bg-gradient-to-b from-sky-100 to-blue-100 rounded-lg shadow-lg p-6">
+      <Card className="rounded-lg shadow-md">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-gray-800"> {/* Improved title styling */}
+          <CardTitle className="text-xl font-bold text-gray-800">
             Question {currentQuestionIndex + 1} of{" "}
             {currentChapter?.quizQuestions.length}
           </CardTitle>
@@ -165,7 +165,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
           </RadioGroup>
 
           {(showCurrentAnswer || showResults) && (
-            <Alert className="rounded-lg shadow-md"> {/* Added rounded corners */}
+            <Alert className="rounded-lg shadow-md">
               <AlertDescription>
                 <p className="font-medium mb-2 text-gray-800">Explanation:</p>
                 <p className="text-gray-700">{currentQuestion.explanation}</p>
@@ -176,7 +176,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
       </Card>
 
       {showResults && (
-        <Card className="rounded-lg shadow-md"> {/* Added rounded corners */}
+        <Card className="rounded-lg shadow-md">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800">Quiz Results</CardTitle>
           </CardHeader>
@@ -206,7 +206,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button asChild className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg"> {/* Added button styling */}
+            <Button asChild className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg">
               <Link href="/">
                 <Home className="h-4 w-4 mr-2" />
                 Go to Dashboard
@@ -216,14 +216,14 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
         </Card>
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 rounded-t-lg"> {/* Added rounded corners */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 rounded-t-lg">
         <div className="container flex justify-between items-center">
           <div className="flex gap-2">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className="rounded-lg" {/* Added rounded corners */}
+              className="rounded-lg"
             >
               Previous
             </Button>
@@ -231,7 +231,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
               variant="outline"
               onClick={() => setShowCurrentAnswer(true)}
               disabled={!answers[currentQuestionIndex]}
-              className="rounded-lg" {/* Added rounded corners */}
+              className="rounded-lg"
             >
               <Eye className="h-4 w-4 mr-2" />
               Show Answer
@@ -239,7 +239,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
           </div>
 
           {allQuestionsAnswered && !showResults ? (
-            <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg"> {/* Added button styling */}
+            <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg">
               Submit Quiz
             </Button>
           ) : (
@@ -249,7 +249,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
                 !answers[currentQuestionIndex] ||
                 currentQuestionIndex === currentChapter!.quizQuestions.length - 1
               }
-              className="rounded-lg" {/* Added rounded corners */}
+              className="rounded-lg"
             >
               Next
             </Button>
