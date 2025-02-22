@@ -42,14 +42,13 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     }
   }, [currentQuestion, bookmarks]);
 
-  const currentSubject = quiz?.find((s) => s.subject === selectedSubject);
-  const currentChapter = currentSubject?.chapters?.find(
+  const currentSubject = quiz.find((s) => s.subject === selectedSubject);
+  const currentChapter = currentSubject?.chapters.find(
     (c) => c.chapterName === selectedChapter
   );
-  const currentQuestion = currentChapter?.quizQuestions?.[currentQuestionIndex];
+  const currentQuestion = currentChapter?.quizQuestions[currentQuestionIndex];
 
   const handleAnswer = (answer: string) => {
-    if (!currentQuestion) return;
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = answer;
     setAnswers(newAnswers);
