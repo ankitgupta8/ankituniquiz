@@ -74,9 +74,24 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     }
   };
 
-  const toggleBookmark = (question: any) => { // Placeholder for toggleBookmark function
-    //Implementation to toggle bookmark and update bookmarks state.
-    console.log("Bookmarking question:", question);
+  const toggleBookmark = async (question: any) => {
+    try {
+      if (bookmarks.some(b => b.questionData.question === question.question)) {
+        const bookmark = bookmarks.find(b => b.questionData.question === question.question);
+        await fetch(`/api/bookmarks/${bookmark.id}`, { method: 'DELETE' });
+        setBookmarks(bookmarks.filter(b => b.id !== bookmark.id));
+      } else {
+        const response = await fetch('/api/bookmarks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ questionData: question })
+        });
+        const newBookmark = await response.json();
+        setBookmarks([...bookmarks, newBookmark]);
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    }
   };
 
 

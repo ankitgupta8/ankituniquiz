@@ -5,6 +5,21 @@ import { Link } from "wouter";
 import { QuizAttempt } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, History, LogOut } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Import Tabs component
+
+// Placeholder for BookmarkedQuestions component.  This needs to be implemented separately.
+function BookmarkedQuestions() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Bookmarked Questions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>No bookmarked questions available.</p> {/* Placeholder message */}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
@@ -49,91 +64,102 @@ export default function HomePage() {
       </header>
 
       <main className="container py-8">
-        <div className="grid gap-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-bold">Dashboard</h2>
-            <div className="flex gap-4">
-              <Button asChild>
-                <Link href="/create">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Create Quiz
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/take">
-                  <History className="h-4 w-4 mr-2" />
-                  Take Quiz
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Total Attempts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">
-                  {sortedAttempts?.length || 0}
+        <Tabs defaultValue="stats">
+          <TabsList>
+            <TabsTrigger value="stats">Quiz Stats</TabsTrigger>
+            <TabsTrigger value="bookmarks">Bookmarked Questions</TabsTrigger>
+          </TabsList>
+          <TabsContent value="stats">
+            <div className="grid gap-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-bold">Dashboard</h2>
+                <div className="flex gap-4">
+                  <Button asChild>
+                    <Link href="/create">
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Create Quiz
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link href="/take">
+                      <History className="h-4 w-4 mr-2" />
+                      Take Quiz
+                    </Link>
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Available Quizzes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">
-                  {uniqueQuizCount}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Average Score</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">
-                  {sortedAttempts?.length
-                    ? Math.round(
-                        sortedAttempts.reduce((acc, curr) => acc + curr.score, 0) /
-                          sortedAttempts.length
-                      )
-                    : 0}
-                  %
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {sortedAttempts?.length ? (
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Recent Attempts</h3>
-              <div className="space-y-4">
-                {sortedAttempts.slice(0, 5).map((attempt) => (
-                  <Card key={attempt.id}>
-                    <CardContent className="flex items-center justify-between p-4">
-                      <div>
-                        <p className="font-medium">
-                          {(attempt.quizData as any).map((q: any) => q.subject).join(", ")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(attempt.timestamp!).toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="text-lg font-semibold">
-                        Score: {attempt.score}%
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
               </div>
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Total Attempts</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">
+                      {sortedAttempts?.length || 0}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Available Quizzes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">
+                      {uniqueQuizCount}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Average Score</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">
+                      {sortedAttempts?.length
+                        ? Math.round(
+                            sortedAttempts.reduce((acc, curr) => acc + curr.score, 0) /
+                              sortedAttempts.length
+                          )
+                        : 0}
+                      %
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {sortedAttempts?.length ? (
+                <div className="mt-8">
+                  <h3 className="text-xl font-semibold mb-4">Recent Attempts</h3>
+                  <div className="space-y-4">
+                    {sortedAttempts.slice(0, 5).map((attempt) => (
+                      <Card key={attempt.id}>
+                        <CardContent className="flex items-center justify-between p-4">
+                          <div>
+                            <p className="font-medium">
+                              {(attempt.quizData as any).map((q: any) => q.subject).join(", ")}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(attempt.timestamp!).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="text-lg font-semibold">
+                            Score: {attempt.score}%
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
-          ) : null}
-        </div>
+          </TabsContent>
+          <TabsContent value="bookmarks">
+            <BookmarkedQuestions />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
