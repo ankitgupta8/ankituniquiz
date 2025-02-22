@@ -57,7 +57,7 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
     <div className="form-container space-y-6 rounded-lg p-6 bg-gray-100 shadow-md"> {/* Added styling */}
       <Textarea
         placeholder="Paste your quiz JSON here..."
-        className="min-h-[300px] font-mono rounded-lg p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" /* Added styling */
+        className="min-h-[300px] font-mono rounded-lg p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" {/* Added styling */}
         {...form.register("json")}
       />
 
