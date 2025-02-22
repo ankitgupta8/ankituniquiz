@@ -9,7 +9,6 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import CreateQuiz from "@/pages/create-quiz";
 import TakeQuiz from "@/pages/take-quiz";
-import BookmarkedQuestions from "@/pages/bookmarked-questions";
 
 function Router() {
   return (
@@ -18,7 +17,6 @@ function Router() {
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/create" component={CreateQuiz} />
       <ProtectedRoute path="/take" component={TakeQuiz} />
-      <ProtectedRoute path="/bookmarks" component={BookmarkedQuestions} />
       <Route component={NotFound} />
     </Switch>
   );

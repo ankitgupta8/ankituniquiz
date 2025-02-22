@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { quizSchema, insertBookmarkedQuestionSchema } from "@shared/schema";
+import { quizSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -43,55 +43,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const attempts = await storage.getQuizAttempts(req.user.id);
       res.json(attempts);
-    } catch (error) {
-      res.status(500).json({ message: "Server error" });
-    }
-  });
-
-  // Bookmark routes
-  app.post("/api/bookmarks", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-
-    try {
-      const bookmarkData = insertBookmarkedQuestionSchema.parse({
-        ...req.body,
-        userId: req.user.id,
-      });
-
-      const bookmark = await storage.createBookmark(bookmarkData);
-      res.status(201).json(bookmark);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid bookmark data format" });
-      } else {
-        res.status(500).json({ message: "Server error" });
-      }
-    }
-  });
-
-  app.get("/api/bookmarks", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-
-    try {
-      const bookmarks = await storage.getBookmarks(req.user.id);
-      res.json(bookmarks);
-    } catch (error) {
-      res.status(500).json({ message: "Server error" });
-    }
-  });
-
-  app.delete("/api/bookmarks/:id", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-
-    try {
-      await storage.deleteBookmark(parseInt(req.params.id), req.user.id);
-      res.sendStatus(204);
     } catch (error) {
       res.status(500).json({ message: "Server error" });
     }
