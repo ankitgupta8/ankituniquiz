@@ -223,7 +223,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
               variant="outline"
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className="rounded-lg dark:text-gray-100 dark:border-gray-700" {/* Added dark mode styles */}
+              className="rounded-lg dark:text-gray-100 dark:border-gray-700" /* Added dark mode styles */
             >
               Previous
             </Button>
@@ -231,7 +231,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
               variant="outline"
               onClick={() => setShowCurrentAnswer(true)}
               disabled={!answers[currentQuestionIndex]}
-              className="rounded-lg dark:text-gray-100 dark:border-gray-700" {/* Added dark mode styles */}
+              className="rounded-lg dark:text-gray-100 dark:border-gray-700" /* Added dark mode styles */
             >
               <Eye className="h-4 w-4 mr-2" />
               Show Answer
@@ -249,7 +249,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
                 !answers[currentQuestionIndex] ||
                 currentQuestionIndex === currentChapter!.quizQuestions.length - 1
               }
-              className="rounded-lg dark:text-gray-100 dark:border-gray-700" {/* Added dark mode styles */}
+              className="rounded-lg dark:text-gray-100 dark:border-gray-700" /* Added dark mode styles */
             >
               Next
             </Button>
