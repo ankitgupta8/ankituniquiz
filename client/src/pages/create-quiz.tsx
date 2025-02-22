@@ -16,8 +16,7 @@ export default function CreateQuiz() {
 
   const submitMutation = useMutation({
     mutationFn: async (data: { quizData: Quiz; score: number }) => {
-      // Add a flag to indicate this is a quiz creation
-      const res = await apiRequest("POST", "/api/quizzes", { ...data, isQuizCreation: true });
+      const res = await apiRequest("POST", "/api/quizzes", data);
       return res.json();
     },
     onSuccess: () => {
@@ -68,44 +67,6 @@ export default function CreateQuiz() {
                 )}
               </TabsContent>
             </Tabs>
-
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-2">Example JSON Structure</h3>
-              <Card className="bg-muted">
-                <CardContent>
-                  <pre 
-                    className="p-4 rounded-lg cursor-pointer" 
-                    onClick={(e) => {
-                      const text = e.currentTarget.textContent;
-                      if (text) navigator.clipboard.writeText(text);
-                      toast({
-                        title: "Copied!",
-                        description: "JSON structure copied to clipboard",
-                      });
-                    }}
-                  >
-{`[
-  {
-    "subject": "Mathematics",
-    "chapters": [
-      {
-        "chapterName": "Algebra",
-        "quizQuestions": [
-          {
-            "question": "What is the value of x in 2x + 4 = 10?",
-            "options": ["2", "3", "4", "5"],
-            "correctAnswer": "3",
-            "explanation": "Subtract 4 from both sides: 2x = 6, then divide by 2: x = 3"
-          }
-        ]
-      }
-    ]
-  }
-]`}
-                  </pre>
-                </CardContent>
-              </Card>
-            </div>
           </CardContent>
         </Card>
       </div>

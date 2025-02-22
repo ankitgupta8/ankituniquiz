@@ -11,10 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, Home, Bookmark, BookmarkX } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Home } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
-import { useToast } from "@/hooks/use-toast"; // Updated import for toast notifications
 
 type QuizDisplayProps = {
   quiz: Quiz;
@@ -29,8 +28,6 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
-  const [bookmarks, setBookmarks] = useState([]); // Added bookmark state
-  const toast = useToast(); // Initialize useToast hook
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
@@ -76,54 +73,6 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     }
   };
 
-  const [isBookmarked, setIsBookmarked] = useState(false); // Added bookmark state
-
-  const handleBookmark = async () => {
-    if (!currentQuestion) return; // Handle case where currentQuestion is null
-    try {
-      const bookmarkIndex = bookmarks.findIndex(b => b.questionData.question === currentQuestion.question);
-      const method = bookmarkIndex !== -1 ? 'DELETE' : 'POST';
-      const bookmarkId = bookmarkIndex !== -1 ? bookmarks[bookmarkIndex].id : undefined;
-      const url = bookmarkId ? `/api/bookmarks/${bookmarkId}` : '/api/bookmarks';
-      const body = method === 'POST' ? JSON.stringify({ questionData: currentQuestion }) : undefined;
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body
-      });
-
-      if (response.ok) {
-        if (method === 'POST') {
-          const newBookmark = await response.json();
-          setBookmarks([...bookmarks, newBookmark]);
-        } else {
-          setBookmarks(bookmarks.filter((_, index) => index !== bookmarkIndex));
-        }
-        setIsBookmarked(!isBookmarked);
-        toast({
-          title: bookmarkIndex !== -1 ? "Bookmark removed" : "Question bookmarked",
-          duration: 2000
-        });
-      } else {
-        console.error("Error during bookmark operation", await response.text());
-        toast({
-          title: "Error handling bookmark",
-          variant: "destructive",
-          duration: 2000
-        });
-      }
-    } catch (error) {
-      console.error('Error handling bookmark:', error);
-      toast({
-        title: "Error handling bookmark",
-        variant: "destructive",
-        duration: 2000
-      });
-    }
-  };
-
-
   if (!selectedSubject || !selectedChapter) {
     return (
       <div className="space-y-4">
@@ -168,24 +117,13 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
 
   const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
 
-  // Determine bookmark status
-  const currentBookmark = bookmarks.find(b => b.questionData.question === currentQuestion.question);
-  setIsBookmarked(!!currentBookmark);
-
   return (
     <div className="space-y-6 pb-24">
       <Card>
         <CardHeader>
-          <CardTitle className="flex justify-between items-center">
-            <span>{currentQuestion.question}</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleBookmark}
-              className={`transition-colors ${isBookmarked ? 'text-primary' : ''}`}
-            >
-              <Bookmark className="h-5 w-5" fill={isBookmarked ? "currentColor" : "none"} />
-            </Button>
+          <CardTitle>
+            Question {currentQuestionIndex + 1} of{" "}
+            {currentChapter?.quizQuestions.length}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
