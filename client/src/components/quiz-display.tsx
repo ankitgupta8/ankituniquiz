@@ -156,13 +156,10 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
             </Button>
             <Button
               onClick={handleNext}
-              disabled={
-                !answers[currentQuestionIndex] ||
-                currentQuestionIndex === currentChapter!.quizQuestions.length - 1
-              }
+              disabled={!answers[currentQuestionIndex]}
               className="rounded-lg dark:text-gray-100 dark:border-gray-700"
             >
-              Next
+              {currentQuestionIndex === currentChapter!.quizQuestions.length - 1 ? "Finish" : "Next"}
             </Button>
           </CardFooter>
         </Card>
