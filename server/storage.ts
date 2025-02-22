@@ -13,6 +13,9 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt>;
   getQuizAttempts(userId: number): Promise<QuizAttempt[]>;
+  createBookmark(userId: number, questionData: any): Promise<Bookmark>;
+  getBookmarks(userId: number): Promise<Bookmark[]>;
+  deleteBookmark(bookmarkId: number): Promise<void>;
   sessionStore: session.Store;
 }
 
@@ -24,6 +27,28 @@ export class DatabaseStorage implements IStorage {
       pool,
       createTableIfMissing: true,
     });
+  }
+
+  async createBookmark(userId: number, questionData: any): Promise<Bookmark> {
+    const [bookmark] = await db
+      .insert(bookmarks)
+      .values({ userId, questionData })
+      .returning();
+    return bookmark;
+  }
+
+  async getBookmarks(userId: number): Promise<Bookmark[]> {
+    return db
+      .select()
+      .from(bookmarks)
+      .where(eq(bookmarks.userId, userId))
+      .orderBy(bookmarks.timestamp);
+  }
+
+  async deleteBookmark(bookmarkId: number): Promise<void> {
+    await db
+      .delete(bookmarks)
+      .where(eq(bookmarks.id, bookmarkId));
   }
 
   async getUser(id: number): Promise<User | undefined> {

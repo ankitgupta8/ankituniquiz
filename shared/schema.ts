@@ -44,4 +44,18 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export const bookmarks = pgTable("bookmarks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  questionData: jsonb("question_data").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export const insertBookmarkSchema = createInsertSchema(bookmarks).pick({
+  userId: true,
+  questionData: true,
+});
+
 export type Quiz = z.infer<typeof quizSchema>;
+export type InsertBookmark = z.infer<typeof insertBookmarkSchema>;
+export type Bookmark = typeof bookmarks.$inferSelect;

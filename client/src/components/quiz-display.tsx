@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, Home } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Home, Bookmark, BookmarkX } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
 
@@ -28,6 +28,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
+  const [bookmarks, setBookmarks] = useState([]); // Added bookmark state
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
@@ -72,6 +73,12 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
       onComplete(score);
     }
   };
+
+  const toggleBookmark = (question: any) => { // Placeholder for toggleBookmark function
+    //Implementation to toggle bookmark and update bookmarks state.
+    console.log("Bookmarking question:", question);
+  };
+
 
   if (!selectedSubject || !selectedChapter) {
     return (
@@ -121,9 +128,19 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     <div className="space-y-6 pb-24">
       <Card>
         <CardHeader>
-          <CardTitle>
-            Question {currentQuestionIndex + 1} of{" "}
-            {currentChapter?.quizQuestions.length}
+          <CardTitle className="flex justify-between items-center">
+            <span>{currentQuestion.question}</span>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                toggleBookmark(currentQuestion);
+              }}
+              className="p-1 hover:bg-muted rounded-full"
+            >
+              {bookmarks.some(b => b.questionData.question === currentQuestion.question) 
+                ? <Bookmark className="h-5 w-5 text-primary" />
+                : <BookmarkX className="h-5 w-5" />}
+            </button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
