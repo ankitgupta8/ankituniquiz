@@ -86,8 +86,6 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     }
   };
 
-  const [isBookmarked, setIsBookmarked] = useState(false); // Added bookmark state
-
   const handleBookmark = async () => {
     if (!currentQuestion) return; // Handle case where currentQuestion is null
     try {
