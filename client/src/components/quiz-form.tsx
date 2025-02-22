@@ -16,7 +16,7 @@ type QuizFormProps = {
 export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
   const [preview, setPreview] = useState<Quiz | null>(null);
   const { toast } = useToast();
-  
+
   const form = useForm<{ json: string }>({
     defaultValues: {
       json: "",
@@ -54,15 +54,15 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="form-container space-y-6 rounded-lg p-6 bg-gray-100 shadow-md"> {/* Added styling */}
       <Textarea
         placeholder="Paste your quiz JSON here..."
-        className="min-h-[300px] font-mono"
+        className="min-h-[300px] font-mono rounded-lg p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" {/* Added styling */}
         {...form.register("json")}
       />
 
       {preview && (
-        <Card className="bg-muted">
+        <Card className="bg-gray-200 rounded-lg shadow-sm"> {/* Added styling */}
           <CardContent className="p-4 flex items-center gap-2">
             <CheckCircle2 className="text-green-500 h-5 w-5" />
             <span>Quiz format validated successfully!</span>
@@ -71,10 +71,10 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
       )}
 
       <div className="flex gap-4">
-        <Button onClick={handlePreview} variant="outline">
+        <Button onClick={handlePreview} variant="outline" className="rounded-lg"> {/* Added styling */}
           Preview Quiz
         </Button>
-        <Button onClick={handleSubmit} disabled={!preview}>
+        <Button onClick={handleSubmit} disabled={!preview} className="rounded-lg bg-blue-500 hover:bg-blue-700 text-white"> {/* Added styling */}
           Submit Quiz
         </Button>
       </div>
