@@ -29,8 +29,18 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
-  const [bookmarks, setBookmarks] = useState([]); // Added bookmark state
-  const toast = useToast(); // Initialize useToast hook
+  const [bookmarks, setBookmarks] = useState([]); 
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (currentQuestion) {
+      const isCurrentQuestionBookmarked = bookmarks.some(
+        b => b.questionData.question === currentQuestion.question
+      );
+      setIsBookmarked(isCurrentQuestionBookmarked);
+    }
+  }, [currentQuestion, bookmarks]);
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
