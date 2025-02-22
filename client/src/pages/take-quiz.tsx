@@ -4,13 +4,11 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Quiz, QuizAttempt } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, AlertCircle, Book } from "lucide-react";
 
 export default function TakeQuiz() {
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const { data: attempts, isLoading, error } = useQuery<QuizAttempt[]>({
@@ -41,7 +39,6 @@ export default function TakeQuiz() {
         title: "Quiz Completed",
         description: "Your attempt has been saved",
       });
-      setLocation("/");
     },
     onError: (error: Error) => {
       toast({
