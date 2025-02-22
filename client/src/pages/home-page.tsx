@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import { QuizAttempt } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, History, LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle"; // Added import for theme toggle
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
@@ -29,7 +30,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background p-4"> {/* Added padding to the main container */}
       <header className="border-b">
         <div className="container flex items-center justify-between h-16">
           <h1 className="text-2xl font-bold">Quiz Master</h1>
@@ -43,6 +44,7 @@ export default function HomePage() {
               <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>
+            <ThemeToggle /> {/* Added theme toggle */}
           </div>
         </div>
       </header>
