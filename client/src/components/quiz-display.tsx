@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Eye, Home, Bookmark, BookmarkX } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
+import { toast } from 'react-hot-toast'; // Added import for toast notifications
 
 type QuizDisplayProps = {
   quiz: Quiz;
@@ -74,23 +75,50 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     }
   };
 
-  const toggleBookmark = async (question: any) => {
+  const [isBookmarked, setIsBookmarked] = useState(false); // Added bookmark state
+
+  const handleBookmark = async () => {
+    if (!currentQuestion) return; // Handle case where currentQuestion is null
     try {
-      if (bookmarks.some(b => b.questionData.question === question.question)) {
-        const bookmark = bookmarks.find(b => b.questionData.question === question.question);
-        await fetch(`/api/bookmarks/${bookmark.id}`, { method: 'DELETE' });
-        setBookmarks(bookmarks.filter(b => b.id !== bookmark.id));
-      } else {
-        const response = await fetch('/api/bookmarks', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questionData: question })
+      const bookmarkIndex = bookmarks.findIndex(b => b.questionData.question === currentQuestion.question);
+      const method = bookmarkIndex !== -1 ? 'DELETE' : 'POST';
+      const bookmarkId = bookmarkIndex !== -1 ? bookmarks[bookmarkIndex].id : undefined;
+      const url = bookmarkId ? `/api/bookmarks/${bookmarkId}` : '/api/bookmarks';
+      const body = method === 'POST' ? JSON.stringify({ questionData: currentQuestion }) : undefined;
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body
+      });
+
+      if (response.ok) {
+        if (method === 'POST') {
+          const newBookmark = await response.json();
+          setBookmarks([...bookmarks, newBookmark]);
+        } else {
+          setBookmarks(bookmarks.filter((_, index) => index !== bookmarkIndex));
+        }
+        setIsBookmarked(!isBookmarked);
+        toast({
+          title: bookmarkIndex !== -1 ? "Bookmark removed" : "Question bookmarked",
+          duration: 2000
         });
-        const newBookmark = await response.json();
-        setBookmarks([...bookmarks, newBookmark]);
+      } else {
+        console.error("Error during bookmark operation", await response.text());
+        toast({
+          title: "Error handling bookmark",
+          variant: "destructive",
+          duration: 2000
+        });
       }
     } catch (error) {
-      console.error('Error toggling bookmark:', error);
+      console.error('Error handling bookmark:', error);
+      toast({
+        title: "Error handling bookmark",
+        variant: "destructive",
+        duration: 2000
+      });
     }
   };
 
@@ -139,23 +167,24 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
 
   const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
 
+  // Determine bookmark status
+  const currentBookmark = bookmarks.find(b => b.questionData.question === currentQuestion.question);
+  setIsBookmarked(!!currentBookmark);
+
   return (
     <div className="space-y-6 pb-24">
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
             <span>{currentQuestion.question}</span>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                toggleBookmark(currentQuestion);
-              }}
-              className="p-1 hover:bg-muted rounded-full"
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleBookmark}
+              className={`transition-colors ${isBookmarked ? 'text-primary' : ''}`}
             >
-              {bookmarks.some(b => b.questionData.question === currentQuestion.question) 
-                ? <Bookmark className="h-5 w-5 text-primary" />
-                : <BookmarkX className="h-5 w-5" />}
-            </button>
+              <Bookmark className="h-5 w-5" fill={isBookmarked ? "currentColor" : "none"} />
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
