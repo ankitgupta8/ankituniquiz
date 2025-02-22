@@ -7,11 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Eye } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type QuizDisplayProps = {
   quiz: Quiz;
@@ -24,6 +25,7 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
@@ -35,6 +37,7 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = answer;
     setAnswers(newAnswers);
+    setShowCurrentAnswer(false);
   };
 
   const calculateScore = () => {
@@ -49,12 +52,14 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
   const handleNext = () => {
     if (currentChapter && currentQuestionIndex < currentChapter.quizQuestions.length - 1) {
       setCurrentQuestionIndex(i => i + 1);
+      setShowCurrentAnswer(false);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(i => i - 1);
+      setShowCurrentAnswer(false);
     }
   };
 
@@ -106,63 +111,80 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
     answers.length === currentChapter.quizQuestions.length && 
     answers.every(answer => answer);
 
-  return (
-    <Card className="mt-4">
-      <CardHeader>
-        <CardTitle>
-          Question {currentQuestionIndex + 1} of{" "}
-          {currentChapter?.quizQuestions.length}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <p className="text-lg">{currentQuestion.question}</p>
+  const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
 
-        <RadioGroup
-          value={answers[currentQuestionIndex]}
-          onValueChange={handleAnswer}
-        >
-          {currentQuestion.options.map((option) => (
-            <div
-              key={option}
-              className={`flex items-center space-x-2 p-2 rounded ${
-                showResults
-                  ? option === currentQuestion.correctAnswer
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Question {currentQuestionIndex + 1} of{" "}
+            {currentChapter?.quizQuestions.length}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <p className="text-lg">{currentQuestion.question}</p>
+
+          <RadioGroup
+            value={answers[currentQuestionIndex]}
+            onValueChange={handleAnswer}
+          >
+            {currentQuestion.options.map((option) => (
+              <div
+                key={option}
+                className={`flex items-center space-x-2 p-2 rounded ${
+                  (showCurrentAnswer || showResults) &&
+                  (option === currentQuestion.correctAnswer
                     ? "bg-green-100"
                     : option === answers[currentQuestionIndex]
                     ? "bg-red-100"
-                    : ""
-                  : ""
-              }`}
-            >
-              <RadioGroupItem value={option} id={option} />
-              <Label htmlFor={option}>{option}</Label>
-              {showResults && option === currentQuestion.correctAnswer && (
-                <CheckCircle2 className="h-5 w-5 text-green-500 ml-auto" />
-              )}
-              {showResults &&
-                option === answers[currentQuestionIndex] &&
-                option !== currentQuestion.correctAnswer && (
-                  <XCircle className="h-5 w-5 text-red-500 ml-auto" />
+                    : "")
+                }`}
+              >
+                <RadioGroupItem value={option} id={option} />
+                <Label htmlFor={option}>{option}</Label>
+                {(showCurrentAnswer || showResults) && (
+                  <>
+                    {option === currentQuestion.correctAnswer && (
+                      <CheckCircle2 className="h-5 w-5 text-green-500 ml-auto" />
+                    )}
+                    {option === answers[currentQuestionIndex] &&
+                      option !== currentQuestion.correctAnswer && (
+                        <XCircle className="h-5 w-5 text-red-500 ml-auto" />
+                      )}
+                  </>
                 )}
-            </div>
-          ))}
-        </RadioGroup>
+              </div>
+            ))}
+          </RadioGroup>
 
-        {showResults && (
-          <div className="bg-muted p-4 rounded">
-            <p className="font-medium">Explanation:</p>
-            <p>{currentQuestion.explanation}</p>
+          {(showCurrentAnswer || showResults) && (
+            <Alert>
+              <AlertDescription>
+                <p className="font-medium mb-2">Explanation:</p>
+                <p>{currentQuestion.explanation}</p>
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowCurrentAnswer(true)}
+              disabled={!answers[currentQuestionIndex]}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Show Answer
+            </Button>
           </div>
-        )}
-
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0}
-          >
-            Previous
-          </Button>
 
           {allQuestionsAnswered && !showResults ? (
             <Button onClick={handleSubmit}>
@@ -179,8 +201,41 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
               Next
             </Button>
           )}
-        </div>
-      </CardContent>
-    </Card>
+        </CardFooter>
+      </Card>
+
+      {showResults && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Quiz Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-xl font-bold">
+                Final Score: {calculateScore()}%
+              </p>
+              <div className="space-y-6">
+                {currentChapter?.quizQuestions.map((question, index) => (
+                  <div key={index} className="space-y-2">
+                    <p className="font-medium">
+                      Question {index + 1}: {question.question}
+                    </p>
+                    <p className={answers[index] === question.correctAnswer ? "text-green-600" : "text-red-600"}>
+                      Your Answer: {answers[index]}
+                    </p>
+                    <p className="text-green-600">
+                      Correct Answer: {question.correctAnswer}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {question.explanation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

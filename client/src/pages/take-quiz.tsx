@@ -6,7 +6,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Book } from "lucide-react";
 
 export default function TakeQuiz() {
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
@@ -17,17 +17,18 @@ export default function TakeQuiz() {
     queryKey: ["/api/quizzes"],
   });
 
-  // Get unique quizzes by comparing stringified quiz data
-  const uniqueQuizzes = attempts?.reduce<Quiz[]>((acc, curr) => {
+  // Get unique quizzes and organize them by subject
+  const quizzesBySubject = attempts?.reduce<Record<string, Quiz>>((acc, curr) => {
     const quizData = curr.quizData as Quiz;
-    const exists = acc.some(
-      (q) => JSON.stringify(q) === JSON.stringify(quizData)
-    );
-    if (!exists) {
-      acc.push(quizData);
-    }
+    quizData.forEach((subject) => {
+      const subjectName = subject.subject;
+      if (!acc[subjectName]) {
+        // Create a new quiz array for this subject
+        acc[subjectName] = quizData;
+      }
+    });
     return acc;
-  }, []) || [];
+  }, {});
 
   const submitMutation = useMutation({
     mutationFn: async (data: { quizData: Quiz; score: number }) => {
@@ -83,7 +84,7 @@ export default function TakeQuiz() {
     );
   }
 
-  if (!uniqueQuizzes.length) {
+  if (!quizzesBySubject || Object.keys(quizzesBySubject).length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container py-8">
@@ -112,20 +113,21 @@ export default function TakeQuiz() {
           <CardContent>
             {!selectedQuiz ? (
               <div className="grid gap-4">
-                {uniqueQuizzes.map((quiz, index) => (
+                {Object.entries(quizzesBySubject).map(([subject, quiz]) => (
                   <Card
-                    key={index}
+                    key={subject}
                     className="cursor-pointer hover:bg-accent transition-colors"
                     onClick={() => setSelectedQuiz(quiz)}
                   >
                     <CardContent className="flex items-center justify-between p-4">
-                      <div>
-                        <p className="font-medium">
-                          {quiz[0]?.subject || "Untitled Quiz"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {quiz[0]?.chapters.length} chapter(s)
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <Book className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-medium">{subject}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {quiz.find(q => q.subject === subject)?.chapters.length} chapter(s)
+                          </p>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
