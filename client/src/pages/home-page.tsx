@@ -23,10 +23,11 @@ export default function HomePage() {
     return acc;
   }, [] as string[]).length || 0;
 
-  // Sort attempts by timestamp in descending order
-  const sortedAttempts = attempts?.slice().sort((a, b) => {
-    return new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime();
-  });
+  // Sort attempts by timestamp in descending order and filter out quiz creations
+  const sortedAttempts = attempts?.filter(attempt => !attempt.isQuizCreation)
+    .sort((a, b) => {
+      return new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime();
+    });
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,7 +75,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">
-                  {attempts?.length || 0}
+                  {sortedAttempts?.length || 0}
                 </div>
               </CardContent>
             </Card>
@@ -96,10 +97,10 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">
-                  {attempts?.length
+                  {sortedAttempts?.length
                     ? Math.round(
-                        attempts.reduce((acc, curr) => acc + curr.score, 0) /
-                          attempts.length
+                        sortedAttempts.reduce((acc, curr) => acc + curr.score, 0) /
+                          sortedAttempts.length
                       )
                     : 0}
                   %

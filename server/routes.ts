@@ -16,11 +16,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const quizData = quizSchema.parse(req.body.quizData);
       const score = req.body.score;
-      
+      const isQuizCreation = req.body.isQuizCreation || false;
+
       const attempt = await storage.createQuizAttempt({
         userId: req.user.id,
         quizData,
-        score
+        score,
+        isQuizCreation
       });
 
       res.status(201).json(attempt);

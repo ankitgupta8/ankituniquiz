@@ -16,7 +16,8 @@ export default function CreateQuiz() {
 
   const submitMutation = useMutation({
     mutationFn: async (data: { quizData: Quiz; score: number }) => {
-      const res = await apiRequest("POST", "/api/quizzes", data);
+      // Add a flag to indicate this is a quiz creation
+      const res = await apiRequest("POST", "/api/quizzes", { ...data, isQuizCreation: true });
       return res.json();
     },
     onSuccess: () => {
