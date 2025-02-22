@@ -107,14 +107,14 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
       )}
 
       {selectedChapter && !showResults && currentQuestion && (
-        <Card className="quiz-card">
+        <Card className="quiz-card dark:bg-gray-800 dark:text-gray-100"> {/* Added dark mode styling to Card */}
           <CardHeader>
-            <CardTitle className="text-xl font-bold">
+            <CardTitle className="text-xl font-bold text-foreground"> {/* Added text-foreground */}
               Question {currentQuestionIndex + 1} of {currentChapter?.quizQuestions.length}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <p className="text-lg text-gray-800 dark:text-gray-200">{currentQuestion.question}</p>
+            <p className="text-lg text-foreground">{currentQuestion.question}</p> {/* Added text-foreground */}
             <RadioGroup value={answers[currentQuestionIndex] || ""} onValueChange={handleAnswer}>
               {currentQuestion.options.map((option) => (
                 <div
@@ -129,14 +129,14 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
                     : ""}`}
                 >
                   <RadioGroupItem value={option} id={option} />
-                  <Label htmlFor={option} className="flex-1 cursor-pointer text-gray-800 dark:text-gray-200">
+                  <Label htmlFor={option} className="flex-1 cursor-pointer text-foreground"> {/* Added text-foreground */}
                     {option}
                   </Label>
                 </div>
               ))}
             </RadioGroup>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex justify-between dark:text-gray-100 dark:border-gray-700"> {/*Added darkmode styling*/}
             <Button
               variant="outline"
               onClick={handlePrevious}
@@ -171,17 +171,17 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
       {showResults && (
         <Card className="rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-100">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">Quiz Results</CardTitle>
+            <CardTitle className="text-xl font-bold text-gray-100">Quiz Results</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
+              <p className="text-xl font-bold text-gray-100">
                 Final Score: {calculateScore()}%
               </p>
               <div className="space-y-6">
                 {currentChapter?.quizQuestions.map((question, index) => (
                   <div key={index} className="space-y-2">
-                    <p className="font-medium text-gray-800 dark:text-gray-100">
+                    <p className="font-medium text-gray-100">
                       Question {index + 1}: {question.question}
                     </p>
                     <p className={answers[index] === question.correctAnswer ? "text-green-600 dark:text-green-300" : "text-red-600 dark:text-red-300"}>
@@ -190,7 +190,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
                     <p className="text-green-600 dark:text-green-300">
                       Correct Answer: {question.correctAnswer}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-200">
+                    <p className="text-sm text-gray-200">
                       {question.explanation}
                     </p>
                   </div>
@@ -200,7 +200,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
           </CardContent>
           <CardFooter className="flex justify-between">
             <Link href="/">
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2 dark:text-gray-100 dark:border-gray-700"> {/*Added darkmode styling*/}
                 <Home className="h-4 w-4" />
                 Return Home
               </Button>
