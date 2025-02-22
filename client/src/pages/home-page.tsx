@@ -62,7 +62,7 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Average Score</CardTitle>
@@ -94,7 +94,7 @@ export default function HomePage() {
                           {(attempt.quizData as any)[0].subject}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(attempt.timestamp).toLocaleDateString()}
+                          {new Date(attempt.timestamp!).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="text-lg font-semibold">

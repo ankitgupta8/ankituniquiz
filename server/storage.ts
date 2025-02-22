@@ -1,8 +1,11 @@
 import { User, InsertUser, QuizAttempt, InsertQuizAttempt } from "@shared/schema";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import { db, users, quizAttempts } from "./db";
+import { eq } from "drizzle-orm";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -13,56 +16,49 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private quizAttempts: Map<number, QuizAttempt>;
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
-  currentId: number;
-  currentQuizId: number;
 
   constructor() {
-    this.users = new Map();
-    this.quizAttempts = new Map();
-    this.currentId = 1;
-    this.currentQuizId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt> {
-    const id = this.currentQuizId++;
-    const quizAttempt = { 
-      ...attempt, 
-      id,
-      timestamp: new Date()
-    };
-    this.quizAttempts.set(id, quizAttempt);
+    const [quizAttempt] = await db
+      .insert(quizAttempts)
+      .values(attempt)
+      .returning();
     return quizAttempt;
   }
 
   async getQuizAttempts(userId: number): Promise<QuizAttempt[]> {
-    return Array.from(this.quizAttempts.values())
-      .filter(attempt => attempt.userId === userId)
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return db
+      .select()
+      .from(quizAttempts)
+      .where(eq(quizAttempts.userId, userId))
+      .orderBy(quizAttempts.timestamp);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
