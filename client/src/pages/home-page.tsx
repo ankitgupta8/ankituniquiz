@@ -12,6 +12,16 @@ export default function HomePage() {
     queryKey: ["/api/quizzes"],
   });
 
+  // Get unique quiz count by filtering unique quiz data subjects
+  const uniqueQuizCount = attempts?.reduce((acc, curr) => {
+    const quizData = curr.quizData as any;
+    const subject = quizData[0]?.subject;
+    if (!acc.includes(subject)) {
+      acc.push(subject);
+    }
+    return acc;
+  }, [] as string[]).length || 0;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
@@ -54,11 +64,22 @@ export default function HomePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle>Quiz Attempts</CardTitle>
+                <CardTitle>Total Attempts</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">
                   {attempts?.length || 0}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Available Quizzes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">
+                  {uniqueQuizCount}
                 </div>
               </CardContent>
             </Card>

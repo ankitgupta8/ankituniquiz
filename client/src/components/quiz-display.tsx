@@ -46,10 +46,24 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
     return Math.round((correctAnswers / currentChapter.quizQuestions.length) * 100);
   };
 
+  const handleNext = () => {
+    if (currentChapter && currentQuestionIndex < currentChapter.quizQuestions.length - 1) {
+      setCurrentQuestionIndex(i => i + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(i => i - 1);
+    }
+  };
+
   const handleSubmit = () => {
     setShowResults(true);
-    const score = calculateScore();
-    onComplete(score);
+    if (currentChapter && answers.length === currentChapter.quizQuestions.length) {
+      const score = calculateScore();
+      onComplete(score);
+    }
   };
 
   if (!selectedSubject || !selectedChapter) {
@@ -87,6 +101,10 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
   }
 
   if (!currentQuestion) return null;
+
+  const allQuestionsAnswered = currentChapter && 
+    answers.length === currentChapter.quizQuestions.length && 
+    answers.every(answer => answer);
 
   return (
     <Card className="mt-4">
@@ -140,19 +158,23 @@ export function QuizDisplay({ quiz, onComplete }: QuizDisplayProps) {
         <div className="flex justify-between">
           <Button
             variant="outline"
-            onClick={() => setCurrentQuestionIndex((i) => i - 1)}
+            onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
           >
             Previous
           </Button>
-          {currentQuestionIndex === currentChapter!.quizQuestions.length - 1 ? (
-            <Button onClick={handleSubmit} disabled={showResults}>
+
+          {allQuestionsAnswered && !showResults ? (
+            <Button onClick={handleSubmit}>
               Submit Quiz
             </Button>
           ) : (
             <Button
-              onClick={() => setCurrentQuestionIndex((i) => i + 1)}
-              disabled={!answers[currentQuestionIndex]}
+              onClick={handleNext}
+              disabled={
+                !answers[currentQuestionIndex] ||
+                currentQuestionIndex === currentChapter!.quizQuestions.length - 1
+              }
             >
               Next
             </Button>
