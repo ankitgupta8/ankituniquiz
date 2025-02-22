@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Quiz } from "@shared/schema";
 import {
   Select,
@@ -29,18 +29,8 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
-  const [bookmarks, setBookmarks] = useState([]); 
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const toast = useToast();
-
-  useEffect(() => {
-    if (currentQuestion) {
-      const isCurrentQuestionBookmarked = bookmarks.some(
-        b => b.questionData.question === currentQuestion.question
-      );
-      setIsBookmarked(isCurrentQuestionBookmarked);
-    }
-  }, [currentQuestion, bookmarks]);
+  const [bookmarks, setBookmarks] = useState([]); // Added bookmark state
+  const toast = useToast(); // Initialize useToast hook
 
   const currentSubject = quiz.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
@@ -85,6 +75,8 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
       onComplete(score);
     }
   };
+
+  const [isBookmarked, setIsBookmarked] = useState(false); // Added bookmark state
 
   const handleBookmark = async () => {
     if (!currentQuestion) return; // Handle case where currentQuestion is null
