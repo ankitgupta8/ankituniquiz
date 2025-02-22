@@ -118,16 +118,16 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
 
   return (
-    <div className="space-y-6 pb-24 bg-gradient-to-b from-sky-100 to-blue-100 rounded-lg shadow-lg p-6">
-      <Card className="rounded-lg shadow-md">
+    <div className="space-y-6 pb-24 bg-gradient-to-b from-sky-100 to-blue-100 rounded-lg shadow-lg p-6 dark:bg-gray-800 dark:text-gray-100"> {/* Added dark mode styles */}
+      <Card className="rounded-lg shadow-md dark:bg-gray-900 dark:text-gray-100"> {/* Added dark mode styles */}
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-gray-800">
+          <CardTitle className="text-xl font-bold text-gray-800 dark:text-white"> {/* Added dark mode styles */}
             Question {currentQuestionIndex + 1} of{" "}
             {currentChapter?.quizQuestions.length}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <p className="text-lg text-gray-700">{currentQuestion.question}</p>
+          <p className="text-lg text-gray-700 dark:text-gray-200">{currentQuestion.question}</p>
 
           <RadioGroup
             value={answers[currentQuestionIndex]}
@@ -136,27 +136,27 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
             {currentQuestion.options.map((option) => (
               <div
                 key={option}
-                className={`flex items-center space-x-2 p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
+                className={`flex items-center space-x-2 p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 ${
                   (showCurrentAnswer || showResults) &&
                   (option === currentQuestion.correctAnswer
-                    ? "bg-green-100 border-green-200"
+                    ? "bg-green-100 border-green-200 dark:bg-green-700 dark:border-green-800 dark:text-white"
                     : option === answers[currentQuestionIndex]
-                    ? "bg-red-100 border-red-200"
-                    : "")
-                }`}
+                    ? "bg-red-100 border-red-200 dark:bg-red-700 dark:border-red-800 dark:text-white"
+                    : ""
+                )}`}
               >
                 <RadioGroupItem value={option} id={option} />
-                <Label htmlFor={option} className="flex-1 cursor-pointer text-gray-800">
+                <Label htmlFor={option} className="flex-1 cursor-pointer text-gray-800 dark:text-gray-100"> {/* Added dark mode styles */}
                   {option}
                 </Label>
                 {(showCurrentAnswer || showResults) && (
                   <>
                     {option === currentQuestion.correctAnswer && (
-                      <CheckCircle2 className="h-5 w-5 text-green-500 ml-auto" />
+                      <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-300 ml-auto" />
                     )}
                     {option === answers[currentQuestionIndex] &&
                       option !== currentQuestion.correctAnswer && (
-                        <XCircle className="h-5 w-5 text-red-500 ml-auto" />
+                        <XCircle className="h-5 w-5 text-red-500 dark:text-red-300 ml-auto" />
                       )}
                   </>
                 )}
@@ -165,10 +165,10 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
           </RadioGroup>
 
           {(showCurrentAnswer || showResults) && (
-            <Alert className="rounded-lg shadow-md">
+            <Alert className="rounded-lg shadow-md dark:bg-gray-900 dark:text-gray-100"> {/* Added dark mode styles */}
               <AlertDescription>
-                <p className="font-medium mb-2 text-gray-800">Explanation:</p>
-                <p className="text-gray-700">{currentQuestion.explanation}</p>
+                <p className="font-medium mb-2 text-gray-800 dark:text-white">Explanation:</p> {/* Added dark mode styles */}
+                <p className="text-gray-700 dark:text-gray-200">{currentQuestion.explanation}</p>
               </AlertDescription>
             </Alert>
           )}
@@ -176,28 +176,28 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
       </Card>
 
       {showResults && (
-        <Card className="rounded-lg shadow-md">
+        <Card className="rounded-lg shadow-md dark:bg-gray-900 dark:text-gray-100"> {/* Added dark mode styles */}
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-800">Quiz Results</CardTitle>
+            <CardTitle className="text-xl font-bold text-gray-800 dark:text-white">Quiz Results</CardTitle> {/* Added dark mode styles */}
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <p className="text-xl font-bold text-gray-800">
+              <p className="text-xl font-bold text-gray-800 dark:text-white">
                 Final Score: {calculateScore()}%
               </p>
               <div className="space-y-6">
                 {currentChapter?.quizQuestions.map((question, index) => (
                   <div key={index} className="space-y-2">
-                    <p className="font-medium text-gray-800">
+                    <p className="font-medium text-gray-800 dark:text-white">
                       Question {index + 1}: {question.question}
                     </p>
-                    <p className={answers[index] === question.correctAnswer ? "text-green-600" : "text-red-600"}>
+                    <p className={answers[index] === question.correctAnswer ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
                       Your Answer: {answers[index]}
                     </p>
-                    <p className="text-green-600">
+                    <p className="text-green-600 dark:text-green-400">
                       Correct Answer: {question.correctAnswer}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       {question.explanation}
                     </p>
                   </div>
@@ -206,7 +206,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button asChild className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg">
+            <Button asChild className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg dark:bg-blue-600 dark:hover:bg-blue-700"> {/* Added dark mode styles */}
               <Link href="/">
                 <Home className="h-4 w-4 mr-2" />
                 Go to Dashboard
@@ -216,14 +216,14 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
         </Card>
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 rounded-t-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 rounded-t-lg dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"> {/* Added dark mode styles */}
         <div className="container flex justify-between items-center">
           <div className="flex gap-2">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className="rounded-lg"
+              className="rounded-lg dark:text-gray-100 dark:border-gray-700" {/* Added dark mode styles */}
             >
               Previous
             </Button>
@@ -231,7 +231,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
               variant="outline"
               onClick={() => setShowCurrentAnswer(true)}
               disabled={!answers[currentQuestionIndex]}
-              className="rounded-lg"
+              className="rounded-lg dark:text-gray-100 dark:border-gray-700" {/* Added dark mode styles */}
             >
               <Eye className="h-4 w-4 mr-2" />
               Show Answer
@@ -239,7 +239,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
           </div>
 
           {allQuestionsAnswered && !showResults ? (
-            <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg">
+            <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg dark:bg-blue-600 dark:hover:bg-blue-700"> {/* Added dark mode styles */}
               Submit Quiz
             </Button>
           ) : (
@@ -249,7 +249,7 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
                 !answers[currentQuestionIndex] ||
                 currentQuestionIndex === currentChapter!.quizQuestions.length - 1
               }
-              className="rounded-lg"
+              className="rounded-lg dark:text-gray-100 dark:border-gray-700" {/* Added dark mode styles */}
             >
               Next
             </Button>
