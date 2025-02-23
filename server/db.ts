@@ -5,12 +5,15 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-if (!process.env.DATABASE_URL) {
+// Construct the DATABASE_URL using the Aiven PostgreSQL credentials
+const DATABASE_URL = `postgres://avnadmin:${process.env.PGPASSWORD}@quiz-app-ankit-self-quiz-app.i.aivencloud.com:19218/defaultdb?sslmode=require`;
+
+if (!process.env.PGPASSWORD) {
   throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
+    "PGPASSWORD must be set. Please provide the database password.",
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const pool = new Pool({ connectionString: DATABASE_URL });
 export const db = drizzle(pool, { schema });
 export const { users, quizAttempts } = schema;
