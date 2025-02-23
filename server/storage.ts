@@ -45,19 +45,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt> {
+    // Ensure the quiz data is properly structured before saving
+    const quizData = attempt.quizData;
+    const normalizedQuizData = Array.isArray(quizData) ? quizData : [quizData];
+
     const [quizAttempt] = await db
       .insert(quizAttempts)
-      .values(attempt)
+      .values({
+        ...attempt,
+        quizData: normalizedQuizData
+      })
       .returning();
     return quizAttempt;
   }
 
   async getQuizAttempts(userId: number): Promise<QuizAttempt[]> {
-    return db
+    const attempts = await db
       .select()
       .from(quizAttempts)
       .where(eq(quizAttempts.userId, userId))
       .orderBy(quizAttempts.timestamp);
+
+    // Ensure each attempt's quiz data is properly structured
+    return attempts.map(attempt => ({
+      ...attempt,
+      quizData: Array.isArray(attempt.quizData) ? attempt.quizData : [attempt.quizData]
+    }));
   }
 }
 

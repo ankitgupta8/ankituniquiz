@@ -1,10 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
-import { QuizAttempt } from "@shared/schema";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, History, LogOut } from "lucide-react";
+// Previous imports remain unchanged...
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
