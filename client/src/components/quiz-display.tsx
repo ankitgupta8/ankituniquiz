@@ -29,7 +29,9 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
   const [showResults, setShowResults] = useState(false);
   const [showCurrentAnswer, setShowCurrentAnswer] = useState(false);
 
-  const currentSubject = quiz.find((s) => s.subject === selectedSubject);
+  // Ensure quiz is treated as an array
+  const quizArray = Array.isArray(quiz) ? quiz : [quiz];
+  const currentSubject = quizArray.find((s) => s.subject === selectedSubject);
   const currentChapter = currentSubject?.chapters.find(
     (c) => c.chapterName === selectedChapter
   );
@@ -51,129 +53,161 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
     return Math.round((correctAnswers / currentChapter.quizQuestions.length) * 100);
   };
 
-  const handleNext = () => {
-    if (currentChapter && currentQuestionIndex < currentChapter.quizQuestions.length - 1) {
-      setCurrentQuestionIndex(i => i + 1);
-      setShowCurrentAnswer(false);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(i => i - 1);
-      setShowCurrentAnswer(false);
-    }
-  };
-
-  const handleSubmit = () => {
-    setShowResults(true);
-    if (currentChapter && answers.length === currentChapter.quizQuestions.length) {
-      const score = calculateScore();
-      onComplete(score);
-    }
-  };
-
-  if (!selectedSubject || !selectedChapter) {
-    return (
-      <div className="space-y-4">
-        {!subject && !selectedSubject && (
-          <Select onValueChange={setSelectedSubject}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Subject" />
-            </SelectTrigger>
-            <SelectContent>
-              {quiz.map((subject) => (
-                <SelectItem key={subject.subject} value={subject.subject}>
-                  {subject.subject}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {(selectedSubject || subject) && (
-          <Select onValueChange={setSelectedChapter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Chapter" />
-            </SelectTrigger>
-            <SelectContent>
-              {currentSubject?.chapters.map((chapter) => (
-                <SelectItem key={chapter.chapterName} value={chapter.chapterName}>
-                  {chapter.chapterName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-    );
-  }
-
-  if (!currentQuestion) return null;
-
-  const allQuestionsAnswered = currentChapter && 
-    answers.length === currentChapter.quizQuestions.length && 
-    answers.every(answer => answer);
-
-  const isCurrentAnswerCorrect = answers[currentQuestionIndex] === currentQuestion.correctAnswer;
-
+  // Rest of the component remains unchanged
   return (
     <div className="space-y-6 pb-24 bg-gradient-to-b from-sky-100 to-blue-100 rounded-lg shadow-lg p-6">
-      <Card className="rounded-lg shadow-md">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-gray-800">
-            Question {currentQuestionIndex + 1} of{" "}
-            {currentChapter?.quizQuestions.length}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-lg text-gray-700">{currentQuestion.question}</p>
-
-          <RadioGroup
-            value={answers[currentQuestionIndex]}
-            onValueChange={handleAnswer}
-          >
-            {currentQuestion.options.map((option) => (
-              <div
-                key={option}
-                className={`flex items-center space-x-2 p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
-                  (showCurrentAnswer || showResults) &&
-                  (option === currentQuestion.correctAnswer
-                    ? "bg-green-100 border-green-200"
-                    : option === answers[currentQuestionIndex]
-                    ? "bg-red-100 border-red-200"
-                    : "")
-                }`}
-              >
-                <RadioGroupItem value={option} id={option} />
-                <Label htmlFor={option} className="flex-1 cursor-pointer text-gray-800">
-                  {option}
-                </Label>
-                {(showCurrentAnswer || showResults) && (
-                  <>
-                    {option === currentQuestion.correctAnswer && (
-                      <CheckCircle2 className="h-5 w-5 text-green-500 ml-auto" />
-                    )}
-                    {option === answers[currentQuestionIndex] &&
-                      option !== currentQuestion.correctAnswer && (
-                        <XCircle className="h-5 w-5 text-red-500 ml-auto" />
-                      )}
-                  </>
-                )}
-              </div>
-            ))}
-          </RadioGroup>
-
-          {(showCurrentAnswer || showResults) && (
-            <Alert className="rounded-lg shadow-md">
-              <AlertDescription>
-                <p className="font-medium mb-2 text-gray-800">Explanation:</p>
-                <p className="text-gray-700">{currentQuestion.explanation}</p>
-              </AlertDescription>
-            </Alert>
+      {!selectedSubject || !selectedChapter ? (
+        <div className="space-y-4">
+          {!subject && !selectedSubject && (
+            <Select onValueChange={setSelectedSubject}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Subject" />
+              </SelectTrigger>
+              <SelectContent>
+                {quizArray.map((subject) => (
+                  <SelectItem key={subject.subject} value={subject.subject}>
+                    {subject.subject}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
-        </CardContent>
-      </Card>
+
+          {(selectedSubject || subject) && (
+            <Select onValueChange={setSelectedChapter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Chapter" />
+              </SelectTrigger>
+              <SelectContent>
+                {currentSubject?.chapters.map((chapter) => (
+                  <SelectItem key={chapter.chapterName} value={chapter.chapterName}>
+                    {chapter.chapterName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+      ) : null}
+
+      {currentQuestion && (
+        <>
+          <Card className="rounded-lg shadow-md">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-gray-800">
+                Question {currentQuestionIndex + 1} of{" "}
+                {currentChapter?.quizQuestions.length}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-lg text-gray-700">{currentQuestion.question}</p>
+
+              <RadioGroup
+                value={answers[currentQuestionIndex]}
+                onValueChange={handleAnswer}
+              >
+                {currentQuestion.options.map((option) => (
+                  <div
+                    key={option}
+                    className={`flex items-center space-x-2 p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
+                      (showCurrentAnswer || showResults) &&
+                      (option === currentQuestion.correctAnswer
+                        ? "bg-green-100 border-green-200"
+                        : option === answers[currentQuestionIndex]
+                        ? "bg-red-100 border-red-200"
+                        : "")
+                    }`}
+                  >
+                    <RadioGroupItem value={option} id={option} />
+                    <Label htmlFor={option} className="flex-1 cursor-pointer text-gray-800">
+                      {option}
+                    </Label>
+                    {(showCurrentAnswer || showResults) && (
+                      <>
+                        {option === currentQuestion.correctAnswer && (
+                          <CheckCircle2 className="h-5 w-5 text-green-500 ml-auto" />
+                        )}
+                        {option === answers[currentQuestionIndex] &&
+                          option !== currentQuestion.correctAnswer && (
+                            <XCircle className="h-5 w-5 text-red-500 ml-auto" />
+                          )}
+                      </>
+                    )}
+                  </div>
+                ))}
+              </RadioGroup>
+
+              {(showCurrentAnswer || showResults) && (
+                <Alert className="rounded-lg shadow-md">
+                  <AlertDescription>
+                    <p className="font-medium mb-2 text-gray-800">Explanation:</p>
+                    <p className="text-gray-700">{currentQuestion.explanation}</p>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 rounded-t-lg">
+            <div className="container flex justify-between items-center">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (currentQuestionIndex > 0) {
+                      setCurrentQuestionIndex(i => i - 1);
+                      setShowCurrentAnswer(false);
+                    }
+                  }}
+                  disabled={currentQuestionIndex === 0}
+                  className="rounded-lg"
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCurrentAnswer(true)}
+                  disabled={!answers[currentQuestionIndex]}
+                  className="rounded-lg"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Show Answer
+                </Button>
+              </div>
+
+              {answers.length === currentChapter?.quizQuestions.length &&
+              answers.every(answer => answer) &&
+              !showResults ? (
+                <Button
+                  onClick={() => {
+                    setShowResults(true);
+                    onComplete(calculateScore());
+                  }}
+                  className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg"
+                >
+                  Submit Quiz
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    if (currentChapter && currentQuestionIndex < currentChapter.quizQuestions.length - 1) {
+                      setCurrentQuestionIndex(i => i + 1);
+                      setShowCurrentAnswer(false);
+                    }
+                  }}
+                  disabled={
+                    !answers[currentQuestionIndex] ||
+                    currentQuestionIndex === currentChapter!.quizQuestions.length - 1
+                  }
+                  className="rounded-lg"
+                >
+                  Next
+                </Button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {showResults && (
         <Card className="rounded-lg shadow-md">
@@ -215,47 +249,6 @@ export function QuizDisplay({ quiz, onComplete, subject }: QuizDisplayProps) {
           </CardFooter>
         </Card>
       )}
-
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 rounded-t-lg">
-        <div className="container flex justify-between items-center">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              className="rounded-lg"
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowCurrentAnswer(true)}
-              disabled={!answers[currentQuestionIndex]}
-              className="rounded-lg"
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              Show Answer
-            </Button>
-          </div>
-
-          {allQuestionsAnswered && !showResults ? (
-            <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg">
-              Submit Quiz
-            </Button>
-          ) : (
-            <Button
-              onClick={handleNext}
-              disabled={
-                !answers[currentQuestionIndex] ||
-                currentQuestionIndex === currentChapter!.quizQuestions.length - 1
-              }
-              className="rounded-lg"
-            >
-              Next
-            </Button>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

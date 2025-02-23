@@ -17,12 +17,10 @@ export default function TakeQuiz() {
 
   // Get unique quizzes and organize them by subject
   const quizzesBySubject = attempts?.reduce<Record<string, Quiz>>((acc, curr) => {
-    const quizData = curr.quizData as Quiz;
-    quizData.forEach((subject) => {
-      const subjectName = subject.subject;
-      if (!acc[subjectName]) {
-        // Create a new quiz array for this subject
-        acc[subjectName] = quizData;
+    const quizData = Array.isArray(curr.quizData) ? curr.quizData : [curr.quizData];
+    quizData.forEach((subject: any) => {
+      if (!acc[subject.subject]) {
+        acc[subject.subject] = quizData;
       }
     });
     return acc;
@@ -122,7 +120,7 @@ export default function TakeQuiz() {
                         <div>
                           <p className="font-medium">{subject}</p>
                           <p className="text-sm text-muted-foreground">
-                            {quiz.find(q => q.subject === subject)?.chapters.length} chapter(s)
+                            {quiz.length} chapter(s)
                           </p>
                         </div>
                       </div>
