@@ -1,31 +1,10 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
 import * as schema from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+// Create SQLite database connection
+const sqlite = new Database('sqlite.db');
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
-}
-
-// Configure the pool with SSL settings required by Aiven
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: true
-  }
-});
-
-// Test the connection
-pool.connect((err, client, done) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    return;
-  }
-  console.log('Successfully connected to database');
-  done();
-});
-
-export const db = drizzle(pool, { schema });
+// Create drizzle database instance
+export const db = drizzle(sqlite, { schema });
 export const { users, quizAttempts } = schema;
