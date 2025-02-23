@@ -2,6 +2,8 @@
 
 import { useAuth } from "@/hooks/use-auth";
 
+import { useQuery } from "@tanstack/react-query";
+
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const { data: attempts } = useQuery<QuizAttempt[]>({
