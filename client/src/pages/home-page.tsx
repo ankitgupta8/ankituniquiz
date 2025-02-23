@@ -3,6 +3,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LogOut, PlusCircle, History } from "lucide-react";
 import { Link } from "wouter";
 
