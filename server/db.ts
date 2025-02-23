@@ -5,16 +5,28 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-// Construct the DATABASE_URL using the Aiven PostgreSQL credentials
-const DATABASE_URL = `postgres://avnadmin:AVNS_0FVAZKqzP696rGkGHMS@quiz-app-ankit-self-quiz-app.i.aivencloud.com:19218/defaultdb?sslmode=require`;
-
-if (!DATABASE_URL) {
-  throw new Error(
-    "Failed to construct DATABASE_URL from credentials",
-  );
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is required");
 }
 
-export const pool = new Pool({ connectionString: DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+// Configure the pool with SSL settings required by Aiven
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: true,
+    require: true
+  }
+});
 
+// Test the connection
+pool.connect((err, client, done) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Successfully connected to database');
+  done();
+});
+
+export const db = drizzle(pool, { schema });
 export const { users, quizAttempts } = schema;
