@@ -1,8 +1,10 @@
 // Previous imports remain unchanged...
 
 import { useAuth } from "@/hooks/use-auth";
-
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { LogOut, PlusCircle, History } from "lucide-react";
+import { Link } from "wouter";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
@@ -15,20 +17,13 @@ export default function HomePage() {
     const quizData = curr.quizData as any;
     if (!quizData) return acc;
 
-    // Handle both array and single object cases
-    const subjects = Array.isArray(quizData) 
-      ? quizData.map(q => q.subject)
-      : [quizData.subject];
-
-    // Add only unique subjects
-    subjects.forEach(subject => {
-      if (!acc.includes(subject)) {
-        acc.push(subject);
-      }
-    });
+    const subject = quizData.subject;
+    if (subject && !acc.includes(subject)) {
+      acc.push(subject);
+    }
 
     return acc;
-  }, []).length || 0;
+  }, [])?.length || 0;
 
   // Sort attempts by timestamp in descending order
   const sortedAttempts = attempts?.slice().sort((a, b) => {
