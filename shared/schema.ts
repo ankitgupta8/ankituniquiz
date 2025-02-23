@@ -21,24 +21,39 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+// Single quiz question schema
+const quizQuestionSchema = z.object({
+  question: z.string(),
+  options: z.array(z.string()),
+  correctAnswer: z.string(),
+  explanation: z.string()
+});
+
+// Chapter schema
+const chapterSchema = z.object({
+  chapterName: z.string(),
+  quizQuestions: z.array(quizQuestionSchema)
+});
+
+// Quiz schema - allows either a single subject or an array of subjects
+export const quizSchema = z.union([
+  // Single subject format
+  z.object({
+    subject: z.string(),
+    chapters: z.array(chapterSchema)
+  }),
+  // Array of subjects format
+  z.array(z.object({
+    subject: z.string(),
+    chapters: z.array(chapterSchema)
+  }))
+]);
+
 export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).pick({
   userId: true,
   quizData: true,
   score: true,
 });
-
-export const quizSchema = z.array(z.object({
-  subject: z.string(),
-  chapters: z.array(z.object({
-    chapterName: z.string(),
-    quizQuestions: z.array(z.object({
-      question: z.string(),
-      options: z.array(z.string()),
-      correctAnswer: z.string(),
-      explanation: z.string()
-    }))
-  }))
-}));
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;

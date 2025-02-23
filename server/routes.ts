@@ -16,7 +16,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const quizData = quizSchema.parse(req.body.quizData);
       const score = req.body.score;
-      
+
       const attempt = await storage.createQuizAttempt({
         userId: req.user.id,
         quizData,
@@ -25,8 +25,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(attempt);
     } catch (error) {
+      console.error('Quiz validation error:', error);
       if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid quiz data format" });
+        res.status(400).json({ 
+          message: "Invalid quiz data format",
+          errors: error.errors 
+        });
       } else {
         res.status(500).json({ message: "Server error" });
       }
