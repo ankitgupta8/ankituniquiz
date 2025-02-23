@@ -12,16 +12,25 @@ export default function HomePage() {
     queryKey: ["/api/quizzes"],
   });
 
-  // Get unique quiz count by filtering unique quiz data subjects
-  const uniqueQuizCount = attempts?.reduce((acc, curr) => {
+  // Get unique quiz count
+  const uniqueQuizCount = attempts?.reduce((acc: string[], curr) => {
     const quizData = curr.quizData as any;
-    quizData.forEach((subject: any) => {
-      if (!acc.includes(subject.subject)) {
-        acc.push(subject.subject);
+    if (!quizData) return acc;
+
+    // Handle both array and single object cases
+    const subjects = Array.isArray(quizData) 
+      ? quizData.map(q => q.subject)
+      : [quizData.subject];
+
+    // Add only unique subjects
+    subjects.forEach(subject => {
+      if (!acc.includes(subject)) {
+        acc.push(subject);
       }
     });
+
     return acc;
-  }, [] as string[]).length || 0;
+  }, []).length || 0;
 
   // Sort attempts by timestamp in descending order
   const sortedAttempts = attempts?.slice().sort((a, b) => {
@@ -117,7 +126,9 @@ export default function HomePage() {
                     <CardContent className="flex items-center justify-between p-4">
                       <div>
                         <p className="font-medium">
-                          {(attempt.quizData as any).map((q: any) => q.subject).join(", ")}
+                          {Array.isArray(attempt.quizData)
+                            ? (attempt.quizData as any[]).map(q => q.subject).join(", ")
+                            : (attempt.quizData as any).subject}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(attempt.timestamp!).toLocaleString()}
