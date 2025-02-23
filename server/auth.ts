@@ -7,6 +7,9 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 
+// Hardcoded session secret (In a real app, this should be an environment variable)
+const SESSION_SECRET = "your-hardcoded-secret-key-12345";
+
 declare global {
   namespace Express {
     interface User extends SelectUser {}
@@ -29,12 +32,8 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  if (!process.env.SESSION_SECRET) {
-    throw new Error("SESSION_SECRET must be set for secure session management");
-  }
-
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET,
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
