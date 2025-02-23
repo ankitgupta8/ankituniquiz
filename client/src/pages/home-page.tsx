@@ -1,5 +1,7 @@
 // Previous imports remain unchanged...
 
+import { useAuth } from "@/hooks/use-auth";
+
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const { data: attempts } = useQuery<QuizAttempt[]>({
