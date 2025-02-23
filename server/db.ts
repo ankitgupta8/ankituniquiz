@@ -6,5 +6,6 @@ import * as schema from "@shared/schema";
 const sqlite = new Database('sqlite.db');
 
 // Create drizzle database instance
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(sqlite);
+
 export const { users, quizAttempts } = schema;

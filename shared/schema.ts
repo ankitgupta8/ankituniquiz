@@ -1,19 +1,19 @@
-import { pgTable, text, serial, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, blob } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
 
-export const quizAttempts = pgTable("quiz_attempts", {
-  id: serial("id").primaryKey(),
+export const quizAttempts = sqliteTable("quiz_attempts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").notNull(),
-  quizData: jsonb("quiz_data").notNull(),
+  quizData: blob("quiz_data", { mode: "json" }).notNull(),
   score: integer("score").notNull(),
-  timestamp: timestamp("timestamp").defaultNow(),
+  timestamp: integer("timestamp", { mode: "timestamp" }).defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
