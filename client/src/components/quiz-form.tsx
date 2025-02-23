@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,31 +54,39 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
     }
   };
 
+  const sampleQuiz = {
+    subject: "Mathematics",
+    chapters: [
+      {
+        chapterName: "Basic Algebra",
+        quizQuestions: [
+          {
+            question: "What is the value of x in 2x + 4 = 10?",
+            options: ["2", "3", "4", "5"],
+            correctAnswer: "3",
+            explanation: "2x + 4 = 10\n2x = 6\nx = 3"
+          }
+        ]
+      }
+    ]
+  };
+
   return (
-    <div className="form-container space-y-6 rounded-lg p-6 bg-gray-100 shadow-md"> {/* Added styling */}
+    <div className="form-container space-y-6 rounded-lg p-6 bg-gray-100 shadow-md">
       <Textarea
         placeholder="Paste your quiz JSON here..."
-        className="min-h-[300px] font-mono rounded-lg p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" /* Added styling */
+        className="min-h-[300px] font-mono rounded-lg p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
         {...form.register("json")}
       />
 
       {preview && (
-        <Card className="bg-gray-200 rounded-lg shadow-sm"> {/* Added styling */}
+        <Card className="bg-gray-200 rounded-lg shadow-sm">
           <CardContent className="p-4 flex items-center gap-2">
             <CheckCircle2 className="text-green-500 h-5 w-5" />
             <span>Quiz format validated successfully!</span>
           </CardContent>
         </Card>
       )}
-
-      <div className="flex gap-4">
-        <Button onClick={handlePreview} variant="outline" className="rounded-lg">
-          Preview Quiz
-        </Button>
-        <Button onClick={handleSubmit} disabled={!preview} className="rounded-lg bg-blue-500 hover:bg-blue-700 text-white">
-          Submit Quiz
-        </Button>
-      </div>
 
       <div className="mt-6 space-y-2">
         <div className="flex justify-between items-center">
@@ -86,45 +95,24 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
             variant="outline" 
             className="text-xs"
             onClick={() => {
-              navigator.clipboard.writeText(JSON.stringify([{
-                "subject": "Mathematics",
-                "chapters": [
-                  {
-                    "chapterName": "Basic Algebra",
-                    "quizQuestions": [
-                      {
-                        "question": "What is the value of x in 2x + 4 = 10?",
-                        "options": ["2", "3", "4", "5"],
-                        "correctAnswer": "3",
-                        "explanation": "2x + 4 = 10\n2x = 6\nx = 3"
-                      }
-                    ]
-                  }
-                ]
-              }], null, 2));
+              navigator.clipboard.writeText(JSON.stringify(sampleQuiz, null, 2));
             }}
           >
             Copy
           </Button>
         </div>
         <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto">
-          {JSON.stringify([{
-            "subject": "Mathematics",
-            "chapters": [
-              {
-                "chapterName": "Basic Algebra",
-                "quizQuestions": [
-                  {
-                    "question": "What is the value of x in 2x + 4 = 10?",
-                    "options": ["2", "3", "4", "5"],
-                    "correctAnswer": "3",
-                    "explanation": "2x + 4 = 10\n2x = 6\nx = 3"
-                  }
-                ]
-              }
-            ]
-          }, null, 2)}
+          {JSON.stringify(sampleQuiz, null, 2)}
         </pre>
+      </div>
+
+      <div className="flex gap-4">
+        <Button onClick={handlePreview} variant="outline" className="rounded-lg">
+          Preview Quiz
+        </Button>
+        <Button onClick={handleSubmit} disabled={!preview} className="rounded-lg bg-blue-500 hover:bg-blue-700 text-white">
+          Submit Quiz
+        </Button>
       </div>
     </div>
   );
