@@ -80,7 +80,33 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
       </div>
 
       <div className="mt-6 space-y-2">
-        <p className="text-sm font-medium">Sample Quiz Format:</p>
+        <div className="flex justify-between items-center">
+          <p className="text-sm font-medium">Sample Quiz Format:</p>
+          <Button 
+            variant="outline" 
+            className="text-xs"
+            onClick={() => {
+              navigator.clipboard.writeText(JSON.stringify({
+                "subject": "Mathematics",
+                "chapters": [
+                  {
+                    "title": "Basic Algebra",
+                    "questions": [
+                      {
+                        "text": "What is the value of x in 2x + 4 = 10?",
+                        "options": ["2", "3", "4", "5"],
+                        "correctAnswer": 1,
+                        "explanation": "2x + 4 = 10\n2x = 6\nx = 3"
+                      }
+                    ]
+                  }
+                ]
+              }, null, 2));
+            }}
+          >
+            Copy
+          </Button>
+        </div>
         <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto">
           {JSON.stringify({
             "subject": "Mathematics",
