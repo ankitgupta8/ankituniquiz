@@ -71,12 +71,34 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
       )}
 
       <div className="flex gap-4">
-        <Button onClick={handlePreview} variant="outline" className="rounded-lg"> {/* Added styling */}
+        <Button onClick={handlePreview} variant="outline" className="rounded-lg">
           Preview Quiz
         </Button>
-        <Button onClick={handleSubmit} disabled={!preview} className="rounded-lg bg-blue-500 hover:bg-blue-700 text-white"> {/* Added styling */}
+        <Button onClick={handleSubmit} disabled={!preview} className="rounded-lg bg-blue-500 hover:bg-blue-700 text-white">
           Submit Quiz
         </Button>
+      </div>
+
+      <div className="mt-6 space-y-2">
+        <p className="text-sm font-medium">Sample Quiz Format:</p>
+        <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto">
+          {JSON.stringify({
+            "subject": "Mathematics",
+            "chapters": [
+              {
+                "title": "Basic Algebra",
+                "questions": [
+                  {
+                    "text": "What is the value of x in 2x + 4 = 10?",
+                    "options": ["2", "3", "4", "5"],
+                    "correctAnswer": 1,
+                    "explanation": "2x + 4 = 10\n2x = 6\nx = 3"
+                  }
+                ]
+              }
+            ]
+          }, null, 2)}
+        </pre>
       </div>
     </div>
   );
