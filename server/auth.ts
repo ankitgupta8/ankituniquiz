@@ -59,6 +59,7 @@ export function setupAuth(app: Express) {
         }
         return done(null, user);
       } catch (error) {
+        console.error("Login error:", error);
         return done(error);
       }
     }),
@@ -73,36 +74,47 @@ export function setupAuth(app: Express) {
       }
       done(null, user);
     } catch (error) {
+      console.error("Deserialization error:", error);
       done(error);
     }
   });
 
   app.post("/api/register", async (req, res) => {
     try {
+      console.log("Registration attempt for username:", req.body.username);
+
+      if (!req.body.username || !req.body.password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
         return res.status(400).json({ message: "Username already exists" });
       }
 
+      const hashedPassword = await hashPassword(req.body.password);
       const user = await storage.createUser({
-        ...req.body,
-        password: await hashPassword(req.body.password),
+        username: req.body.username,
+        password: hashedPassword,
       });
 
       req.login(user, (err) => {
         if (err) {
+          console.error("Login error after registration:", err);
           return res.status(500).json({ message: "Login failed after registration" });
         }
-        res.status(201).json(user);
+        res.status(201).json({ id: user.id, username: user.username });
       });
     } catch (error) {
-      res.status(500).json({ message: "Registration failed" });
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) {
+        console.error("Authentication error:", err);
         return res.status(500).json({ message: "Login failed" });
       }
       if (!user) {
@@ -110,9 +122,10 @@ export function setupAuth(app: Express) {
       }
       req.login(user, (err) => {
         if (err) {
+          console.error("Session creation error:", err);
           return res.status(500).json({ message: "Login failed" });
         }
-        res.status(200).json(user);
+        res.status(200).json({ id: user.id, username: user.username });
       });
     })(req, res, next);
   });
@@ -120,6 +133,7 @@ export function setupAuth(app: Express) {
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
       if (err) {
+        console.error("Logout error:", err);
         return res.status(500).json({ message: "Logout failed" });
       }
       res.sendStatus(200);
