@@ -29,7 +29,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background px-4">
       <header className="border-b">
         <div className="container flex items-center justify-between h-16">
           <h1 className="text-2xl font-bold">Quiz Master</h1>
