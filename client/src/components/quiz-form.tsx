@@ -95,7 +95,7 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
             variant="outline" 
             className="text-xs"
             onClick={() => {
-              navigator.clipboard.writeText(JSON.stringify(sampleQuiz, null, 2));
+              navigator.clipboard.writeText("Convert above text into same as below, keep all the keys same as sample"+JSON.stringify(sampleQuiz, null, 2));
             }}
           >
             Copy
