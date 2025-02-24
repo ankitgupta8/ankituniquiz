@@ -54,7 +54,7 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
     }
   };
 
-  const sampleQuiz = `This is a format to convert text into this type of json {
+  const sampleQuiz = {
     subject: "Mathematics",
     chapters: [
       {
@@ -69,7 +69,7 @@ export function QuizForm({ onSubmit, onPreview }: QuizFormProps) {
         ]
       }
     ]
-  }`;
+  };
 
   return (
     <div className="form-container space-y-6 rounded-lg p-6 bg-gray-100 shadow-md">
